@@ -7,10 +7,6 @@ const game = new Game();
 const commands = [];
 let ctx;
 
-for (let i = 0; i < BOARD_Y_LEN; i++) {
-    game.piles.push(new Array(BOARD_X_LEN).fill(0));
-}
-
 window.addEventListener("DOMContentLoaded", () => {
     const canvas = document.getElementById("canvas");
     ctx = canvas.getContext("2d");
@@ -74,11 +70,24 @@ function renderSquare(x, y, color) {
 }
 
 function renderBlock(block, offx, offy) {
+    let color;
+    switch (block.color) {
+        case 0:
+            color = "rgb(255, 128, 128)";
+            break;
+        case 1:
+            color = "rgb(128, 255, 128)";
+            break;
+        case 2:
+            color = "rgb(128, 128, 255)";
+            break;
+    }
+
     const pattern = block.getPattern();
     for (let i = 0; i < pattern.length; i++) {
         for (let j = 0; j < pattern[i].length; j++) {
             if (pattern[i][j] != 0) {
-                renderSquare(block.x + j + offx, block.y + i + offy, "rgb(255, 128, 128)");
+                renderSquare(block.x + j + offx, block.y + i + offy, color);
             }
         }
     }

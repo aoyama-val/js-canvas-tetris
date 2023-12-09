@@ -15,27 +15,86 @@ const Shapes = [
         [0,0,1,0,0],
         [0,0,0,0,0],
     ],
+    [
+        [0,0,0,0,0],
+        [0,0,1,0,0],
+        [0,0,1,0,0],
+        [0,0,1,1,0],
+        [0,0,0,0,0],
+    ],
+    [
+        [0,0,0,0,0],
+        [0,0,1,0,0],
+        [0,0,1,0,0],
+        [0,1,1,0,0],
+        [0,0,0,0,0],
+    ],
+    [
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,1,1,0],
+        [0,0,1,1,0],
+        [0,0,0,0,0],
+    ],
+    [
+        [0,0,0,0,0],
+        [0,0,1,0,0],
+        [0,1,1,1,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+    ],
+    [
+        [0,0,0,0,0],
+        [0,0,1,0,0],
+        [0,0,1,1,0],
+        [0,0,0,1,0],
+        [0,0,0,0,0],
+    ],
+    [
+        [0,0,0,0,0],
+        [0,0,1,0,0],
+        [0,1,1,0,0],
+        [0,1,0,0,0],
+        [0,0,0,0,0],
+    ],
 ];
 
 class Block {
-    constructor() {
+    constructor(color) {
         this.x = 0;
         this.y = 0;
-        this.rot = 0;
-        this.shape = 0;
+        this.rot = randRange(4);
+        this.shape = randRange(Shapes.length);
+        this.color = color % 3;
     }
 
     getPattern() {
-        // TODO: consider rotate
-        return Shapes[this.shape];
+        let result = Shapes[this.shape];
+        for (let n = 0; n < this.rot; n++) {
+            const next = [];
+            for (let i = 0; i < 5; i++) {
+                next.push(new Array(5).fill(0));
+            }
+            for (let i = 0; i < 5; i++) {
+                for (let j = 0; j < 5; j++) {
+                    next[4 - j][i] = result[i][j];
+                }
+            }
+            result = next;
+        }
+        return result;
     }
 }
 
 class Game {
     constructor() {
-        this.block = new Block();
-        this.nextBlock = new Block();
+        this.blockCreatedCount = 0;
+        this.block = new Block(this.blockCreatedCount++);
+        this.nextBlock = new Block(this.blockCreatedCount++);
         this.piles = [];
+        for (let i = 0; i < BOARD_Y_LEN; i++) {
+            this.piles.push(new Array(BOARD_X_LEN).fill(0));
+        }
     }
 
     update(command) {
@@ -49,6 +108,12 @@ class Game {
             case COMMAND_DOWN:
                 this.move(0, 1);
                 break;
+            case COMMAND_RORATE_LEFT:
+                this.rotate(1);
+                break;
+            case COMMAND_RORATE_RIGHT:
+                this.rotate(-1);
+                break;
         }
     }
 
@@ -58,6 +123,11 @@ class Game {
     }
 
     rotate(dir) {
-        this.block.rot = (this.block.rot + 1) % 4;
+        this.block.rot = (4 + this.block.rot + dir) % 4;
+        console.log(this.block);
     }
+}
+
+function randRange(max) {
+    return Math.floor(Math.random() * max);
 }
