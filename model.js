@@ -120,6 +120,30 @@ class Game {
     move(x, y) {
         this.block.x += x;
         this.block.y += y;
+        if (this.isCollide()) {
+            this.block.x -= x;
+            this.block.y -= y;
+        }
+    }
+
+    isCollide() {
+        const pattern = this.block.getPattern();
+        for (let i = 0; i < 5; i++) {
+            for (let j = 0; j < 5; j++) {
+                if (pattern[i][j] == 1) {
+                    if (this.block.x + j <= 0) {
+                        return true;
+                    }
+                    if (this.block.x + j > BOARD_X_LEN) {
+                        return true;
+                    }
+                    if (this.block.y + i >= BOARD_Y_LEN) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     rotate(dir) {
