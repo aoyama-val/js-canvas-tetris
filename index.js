@@ -1,14 +1,9 @@
 const FPS = 30;
 const CELL_SIZE_PX = 20;
+const NEXT_BLOCK_X = 20;
+const LEFT_WALL_X = 6;
 
-const game = {
-    block: {
-        x: 0,
-        y: 0,
-        rot: 0,
-    },
-    piles: [],
-};
+const game = new Game();
 const commands = [];
 let ctx;
 
@@ -48,19 +43,7 @@ window.addEventListener("keydown", (ev) => {
 });
 
 function onTick() {
-    for (let command of commands) {
-        switch (command) {
-            case COMMAND_LEFT:
-                game.block.x -= 1;
-                break;
-            case COMMAND_RIGHT:
-                game.block.x += 1;
-                break;
-            case COMMAND_DOWN:
-                game.block.y += 1;
-                break;
-        }
-    }
+    game.update(commands[commands.length - 1]);
     commands.splice(0);
     render();
     setTimeout(onTick, 1000 / FPS);
@@ -69,23 +52,34 @@ function onTick() {
 function render() {
     ctx.fillStyle = "#000";
     ctx.fillRect(0, 0, 640, 420);
-    ctx.fillStyle = "green";
-    ctx.fillRect(game.block.x * CELL_SIZE_PX, game.block.y * CELL_SIZE_PX, CELL_SIZE_PX, CELL_SIZE_PX);
     // render walls
     for (let i = 0; i < BOARD_Y_LEN; i++) {
-        renderSquare(6, i, "rgb(128, 128, 128)");
-        renderSquare(6 + BOARD_X_LEN + 1, i, "rgb(128, 128, 128)");
+        renderSquare(LEFT_WALL_X, i, "rgb(128, 128, 128)");
+        renderSquare(LEFT_WALL_X + BOARD_X_LEN + 1, i, "rgb(128, 128, 128)");
     }
     // render floor
     for (let i = 0; i < BOARD_X_LEN + 2; i++) {
-        renderSquare(6 + i, BOARD_Y_LEN, "rgb(128, 128, 128)");
+        renderSquare(LEFT_WALL_X + i, BOARD_Y_LEN, "rgb(128, 128, 128)");
     }
     // render piles
     // render block
+    renderBlock(game.block, LEFT_WALL_X, 0);
     // render next block
+    renderBlock(game.nextBlock, NEXT_BLOCK_X, 0);
 }
 
 function renderSquare(x, y, color) {
     ctx.fillStyle = color;
     ctx.fillRect(x * CELL_SIZE_PX, y * CELL_SIZE_PX, CELL_SIZE_PX, CELL_SIZE_PX);
+}
+
+function renderBlock(block, offx, offy) {
+    const pattern = block.getPattern();
+    for (let i = 0; i < pattern.length; i++) {
+        for (let j = 0; j < pattern[i].length; j++) {
+            if (pattern[i][j] != 0) {
+                renderSquare(block.x + j + offx, block.y + i + offy, "rgb(255, 128, 128)");
+            }
+        }
+    }
 }
