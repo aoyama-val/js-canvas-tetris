@@ -95,6 +95,7 @@ class Game {
         for (let i = 0; i < BOARD_Y_LEN; i++) {
             this.piles.push(new Array(BOARD_X_LEN).fill(0));
         }
+        this.frame = 0;
     }
 
     update(command) {
@@ -115,6 +116,10 @@ class Game {
                 this.rotate(-1);
                 break;
         }
+        if (this.frame != 0 && this.frame % 20 == 0) {
+            this.drop();
+        }
+        this.frame += 1;
     }
 
     move(x, y) {
@@ -149,6 +154,20 @@ class Game {
     rotate(dir) {
         this.block.rot = (4 + this.block.rot + dir) % 4;
         console.log(this.block);
+    }
+
+    drop() {
+        this.block.y += 1;
+        if (this.isCollide()) {
+            this.block.y -= 1;
+             this.settle();
+        }
+    }
+
+    settle() {
+        // TODO: 固定
+        this.block = this.nextBlock;
+        this.nextBlock = new Block(this.blockCreatedCount++);
     }
 }
 
