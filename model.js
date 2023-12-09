@@ -136,10 +136,10 @@ class Game {
         for (let i = 0; i < 5; i++) {
             for (let j = 0; j < 5; j++) {
                 if (pattern[i][j] == 1) {
-                    if (this.block.x + j <= 0) {
+                    if (this.block.x + j < 0) {
                         return true;
                     }
-                    if (this.block.x + j > BOARD_X_LEN) {
+                    if (this.block.x + j >= BOARD_X_LEN) {
                         return true;
                     }
                     if (this.block.y + i >= BOARD_Y_LEN) {
@@ -153,7 +153,6 @@ class Game {
 
     rotate(dir) {
         this.block.rot = (4 + this.block.rot + dir) % 4;
-        console.log(this.block);
     }
 
     drop() {
@@ -165,7 +164,14 @@ class Game {
     }
 
     settle() {
-        // TODO: 固定
+        const pattern = this.block.getPattern();
+        for (let j = 0; j < 5; j++) {
+            for (let i = 0; i < 5; i++) {
+                if (pattern[j][i] == 1) {
+                    this.piles[this.block.y + j][this.block.x + i] = 2 + this.block.color;
+                }
+            }
+        }
         this.block = this.nextBlock;
         this.nextBlock = new Block(this.blockCreatedCount++);
     }

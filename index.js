@@ -12,7 +12,6 @@ window.addEventListener("DOMContentLoaded", () => {
     ctx = canvas.getContext("2d");
 
     setTimeout(onTick, 1000 / FPS);
-
 });
 
 window.addEventListener("keydown", (ev) => {
@@ -58,8 +57,26 @@ function render() {
         renderSquare(LEFT_WALL_X + i, BOARD_Y_LEN, "rgb(128, 128, 128)");
     }
     // render piles
+    for (let j = 0; j < BOARD_Y_LEN; j++) {
+        for (let i = 0; i < BOARD_X_LEN; i++) {
+            switch (game.piles[j][i]) {
+                case 0:
+                    continue;
+                case 2:
+                    color = "rgb(255, 128, 128)";
+                    break;
+                case 3:
+                    color = "rgb(128, 255, 128)";
+                    break;
+                case 4:
+                    color = "rgb(128, 128, 255)";
+                    break;
+            }
+            renderSquare(LEFT_WALL_X + 1 + i, j, color);
+        }
+    }
     // render block
-    renderBlock(game.block, LEFT_WALL_X, 0);
+    renderBlock(game.block, LEFT_WALL_X + 1, 0);
     // render next block
     renderBlock(game.nextBlock, NEXT_BLOCK_X, 0);
 }
