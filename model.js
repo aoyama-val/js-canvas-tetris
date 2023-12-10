@@ -61,7 +61,7 @@ const Shapes = [
 
 class Block {
     constructor(color) {
-        this.x = 0;
+        this.x = 4;
         this.y = 0;
         this.rot = randRange(4);
         this.shape = randRange(Shapes.length);
@@ -88,6 +88,7 @@ class Block {
 
 class Game {
     constructor() {
+        this.isOver = false;
         this.blockCreatedCount = 0;
         this.block = new Block(this.blockCreatedCount++);
         this.nextBlock = new Block(this.blockCreatedCount++);
@@ -99,6 +100,9 @@ class Game {
     }
 
     update(command) {
+        if (this.isOver) {
+            return;
+        }
         switch (command) {
             case COMMAND_LEFT:
                 this.move(-1, 0);
@@ -145,6 +149,9 @@ class Game {
                     if (this.block.y + i >= BOARD_Y_LEN) {
                         return true;
                     }
+                    if (this.piles[this.block.y + i][this.block.x + j] != 0) {
+                        return true;
+                    }
                 }
             }
         }
@@ -152,7 +159,11 @@ class Game {
     }
 
     rotate(dir) {
+        let savedRot = this.block.rot;
         this.block.rot = (4 + this.block.rot + dir) % 4;
+        if (this.isCollide()) {
+            this.block.rot = savedRot;
+        }
     }
 
     drop() {
@@ -172,8 +183,27 @@ class Game {
                 }
             }
         }
+        this.checkEraseRows();
         this.block = this.nextBlock;
+        if (this.isCollide()) {
+            this.isOver = true;
+        }
         this.nextBlock = new Block(this.blockCreatedCount++);
+    }
+
+    checkEraseRows() {
+        let filledRows = [];
+        for (let i = BOARD_Y_LEN - 1; i >= 0; i--) {
+            if (this.piles[i].every(pile => pile != 0)) {
+                filledRows.push(i);
+            }
+        }
+        for (let filledRow of filledRows) {
+            this.piles.splice(filledRow, 1);
+        }
+        for (let filledRow of filledRows) {
+            this.piles.unshift(new Array(BOARD_X_LEN).fill(0));
+        }
     }
 }
 
